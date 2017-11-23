@@ -18,25 +18,25 @@ K = numel(K_range);
 AIC_curve = zeros(1,K);
 BIC_curve = zeros(1,K);
 
-[Priors0, Mu0, ~, Sigma0] = my_gmmInit(X, K, cov_type);
-
 for k=1:K
     aic_max = intmin;
     bic_max = intmin;
     for i=1:repeats
-        [Priors, Mu, Sigma, ~] = my_gmmEM(X, K, cov_type,  Priors0, Mu0, Sigma0, 500);
+        [Priors0, Mu0, ~, Sigma0] = my_gmmInit(X, K_range(k), cov_type);
+        [Priors, Mu, Sigma, ~] = my_gmmEM(X, K_range(k), cov_type,  Priors0, Mu0, Sigma0, 500);
         [aic_current, bic_current] = gmm_metrics(X, Priors, Mu, Sigma, cov_type);
 
-        if(aic_current > aic_max || bic_current > bic_max)
-            AIC_curve(k) = aic_current;
-            BIC_curve(k) = bic_current;
+        if(aic_current > aic_max)
             aic_max = aic_current;
+        end
+        if(bic_current > bic_max)
             bic_max = bic_current;
         end
     end
+    
+     AIC_curve(k) = aic_max;
+     BIC_curve(k) = bic_max;
 end
 
-AIC_curve
-BIC_curve
 
 end
